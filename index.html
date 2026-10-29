@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Store | Explore o Universo</title>
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<header class="header">
+    <div class="logo">✦ GALAXY<span>STORE</span></div>
+
+    <nav>
+        <a href="#inicio">Início</a>
+        <a href="#produtos">Produtos</a>
+        <a href="#sobre">Sobre</a>
+    </nav>
+
+    <div class="actions">
+        <button id="themeBtn">☀️</button>
+        <button id="cartBtn">🛒 <span id="cartCount">0</span></button>
+    </div>
+</header>
+
+<section class="hero" id="inicio">
+    <div class="hero-content">
+        <span class="subtitle">✦ EXPLORE O UNIVERSO</span>
+
+        <h1>O universo está<br>ao seu <span>alcance.</span></h1>
+
+        <p>
+            Descubra produtos incríveis e embarque
+            em uma experiência além das estrelas.
+        </p>
+
+        <a href="#produtos" class="hero-btn">Explorar produtos →</a>
+    </div>
+</section>
+
+<section class="products" id="produtos">
+
+    <div class="section-title">
+        <span>NOSSO UNIVERSO</span>
+        <h2>Explore nossos produtos</h2>
+        <p>Escolha seu próximo destino.</p>
+    </div>
+
+    <div class="categories">
+        <button class="category active" data-category="Todos">Todos</button>
+        <button class="category" data-category="Espaço">Espaço</button>
+        <button class="category" data-category="Decoração">Decoração</button>
+        <button class="category" data-category="Tecnologia">Tecnologia</button>
+    </div>
+
+    <div class="product-grid" id="productGrid"></div>
+
+</section>
+
+<section class="banner">
+    <div>
+        <span>UMA EXPERIÊNCIA EXTRAORDINÁRIA</span>
+        <h2>Além dos limites<br>da imaginação.</h2>
+        <p>Descubra um universo de possibilidades.</p>
+    </div>
+    <div class="planet">🪐</div>
+</section>
+
+<section class="about" id="sobre">
+    <h2>Sobre a Galaxy Store</h2>
+    <p>
+        Nossa missão é levar até você produtos
+        incríveis inspirados no universo, na tecnologia
+        e nas maravilhas do espaço.
+    </p>
+</section>
+
+<footer>
+    <h2>✦ GALAXY STORE</h2>
+    <p>Explore. Descubra. Conquiste o universo.</p>
+    <p>© 2026 Galaxy Store - Todos os direitos reservados.</p>
+</footer>
+
+<!-- CARRINHO -->
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="cart-panel" id="cartPanel">
+
+    <div class="cart-header">
+        <h2>Seu carrinho 🛒</h2>
+        <button id="closeCart">✕</button>
+    </div>
+
+    <div class="cart-items" id="cartItems">
+        <p class="empty">Seu carrinho está vazio.</p>
+    </div>
+
+    <div class="cart-footer">
+        <div class="total">
+            <span>Total:</span>
+            <strong id="cartTotal">R$ 0,00</strong>
+        </div>
+
+        <button id="checkoutBtn">Finalizar pedido</button>
+    </div>
+
+</aside>
+
+<script>
+
+// PRODUTOS
+
+const products = [
+
+{
+id: 1,
+name: "Luminária Galáxia",
+category: "Decoração",
+description: "Iluminação temática inspirada no universo.",
+price: 89.90,
+image: "https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=600"
+},
+
+{
+id: 2,
+name: "Projetor Espacial",
+category: "Tecnologia",
+description: "Transforme seu ambiente em um universo.",
+price: 149.90,
+image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=600"
+},
+
+{
+id: 3,
+name: "Globo Lunar",
+category: "Espaço",
+description: "Uma representação especial da Lua.",
+price: 119.90,
+image: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=600"
+},
+
+{
+id: 4,
+name: "Quadro Universo",
+category: "Decoração",
+description: "Arte espacial para decorar seu ambiente.",
+price: 69.90,
+image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=600"
+},
+
+{
+id: 5,
+name: "Telescópio Astronômico",
+category: "Espaço",
+description: "Explore os detalhes do céu noturno.",
+price: 399.90,
+image: "https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=600"
+},
+
+{
+id: 6,
+name: "Fone Bluetooth",
+category: "Tecnologia",
+description: "Som de qualidade para suas viagens.",
+price: 129.90,
+image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"
+}
+
+];
+
+let cart = [];
+
+const grid = document.getElementById("productGrid");
+
+// DINHEIRO
+
+function money(value) {
+return value.toLocaleString("pt-BR", {
+style: "currency",
+currency: "BRL"
+});
+}
+
+// MOSTRAR PRODUTOS
+
+function renderProducts(category = "Todos") {
+
+grid.innerHTML = "";
+
+const filtered = category === "Todos"
+? products
+: products.filter(p => p.category === category);
+
+filtered.forEach(product => {
+
+grid.innerHTML += `
+
+<div class="product-card">
+
+<img src="${product.image}" alt="${product.name}">
+
+<div class="product-info">
+
+<span>${product.category}</span>
+
+<h3>${product.name}</h3>
+
+<p>${product.description}</p>
+
+<div class="product-bottom">
+
+<strong>${money(product.price)}</strong>
+
+<button onclick="addToCart(${product.id})">
++ Adicionar
+</button>
+
+</div>
+
+</div>
+</div>
+
+`;
+
+});
+
+}
+
+// ADICIONAR
+
+function addToCart(id) {
+
+const product = products.find(p => p.id === id);
+const existing = cart.find(p => p.id === id);
+
+if(existing) {
+existing.quantity++;
+} else {
+cart.push({...product, quantity: 1});
+}
+
+updateCart();
+
+}
+
+// REMOVER
+
+function removeFromCart(id) {
+cart = cart.filter(p => p.id !== id);
+updateCart();
+}
+
+// QUANTIDADE
+
+function changeQuantity(id, amount) {
+
+const item = cart.find(p => p.id === id);
+
+if(!item) return;
+
+item.quantity += amount;
+
+if(item.quantity <= 0) {
+removeFromCart(id);
+} else {
+updateCart();
+}
+
+}
+
+// ATUALIZAR CARRINHO
+
+function updateCart() {
+
+const items = document.getElementById("cartItems");
+
+const count = cart.reduce(
+(sum, item) => sum + item.quantity, 0
+);
+
+const total = cart.reduce(
+(sum, item) => sum + item.price * item.quantity, 0
+);
+
+document.getElementById("cartCount").textContent = count;
+
+document.getElementById("cartTotal").textContent = money(total);
+
+if(cart.length === 0) {
+items.innerHTML = '<p class="empty">Seu carrinho está vazio.</p>';
+return;
+}
+
+items.innerHTML = "";
+
+cart.forEach(item => {
+
+items.innerHTML += `
+
+<div class="cart-item">
+
+<div>
+<h3>${item.name}</h3>
+<p>${money(item.price)}</p>
+
+<div class="quantity">
+<button onclick="changeQuantity(${item.id},-1)">−</button>
+<span>${item.quantity}</span>
+<button onclick="changeQuantity(${item.id},1)">+</button>
+</div>
+</div>
+
+<button class="remove" onclick="removeFromCart(${item.id})">
+🗑️
+</button>
+
+</div>
+
+`;
+
+});
+
+}
+
+// ABRIR CARRINHO
+
+const panel = document.getElementById("cartPanel");
+const overlay = document.getElementById("overlay");
+
+function openCart() {
+panel.classList.add("open");
+overlay.classList.add("show");
+}
+
+function closeCart() {
+panel.classList.remove("open");
+overlay.classList.remove("show");
+}
+
+document.getElementById("cartBtn").onclick = openCart;
+document.getElementById("closeCart").onclick = closeCart;
+overlay.onclick = closeCart;
+
+// CATEGORIAS
+
+document.querySelectorAll(".category").forEach(button => {
+
+button.addEventListener("click", () => {
+
+document.querySelectorAll(".category").forEach(btn => {
+btn.classList.remove("active");
+});
+
+button.classList.add("active");
+
+renderProducts(button.dataset.category);
+
+});
+
+});
+
+// MODO CLARO E ESCURO
+
+const themeBtn = document.getElementById("themeBtn");
+
+function loadTheme() {
+
+const saved = localStorage.getItem("galaxyTheme");
+
+if(saved === "light") {
+document.body.classList.add("light-mode");
+themeBtn.textContent = "🌙";
+} else {
+document.body.classList.remove("light-mode");
+themeBtn.textContent = "☀️";
+}
+
+}
+
+themeBtn.onclick = () => {
+
+document.body.classList.toggle("light-mode");
+
+const light = document.body.classList.contains("light-mode");
+
+themeBtn.textContent = light ? "🌙" : "☀️";
+
+localStorage.setItem("galaxyTheme", light ? "light" : "dark");
+
+};
+
+// WHATSAPP
+
+document.getElementById("checkoutBtn").onclick = () => {
+
+if(cart.length === 0) {
+alert("Seu carrinho está vazio!");
+return;
+}
+
+const phone = "5511999999999";
+
+let message = "Olá! Gostaria de fazer um pedido na Galaxy Store:\n\n";
+
+cart.forEach(item => {
+message += `${item.quantity}x ${item.name} - ${money(item.price * item.quantity)}\n`;
+});
+
+const total = cart.reduce(
+(sum, item) => sum + item.price * item.quantity, 0
+);
+
+message += `\nTotal: ${money(total)}`;
+
+window.open(
+"https://wa.me/" + phone + "?text=" + encodeURIComponent(message),
+"_blank"
+);
+
+};
+
+// INICIALIZAÇÃO
+
+renderProducts();
+updateCart();
+loadTheme();
+
+</script>
+
+</body>
+</html>
